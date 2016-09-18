@@ -1,0 +1,138 @@
+%{
+#include "src/action.h"
+#include <cstdio>
+#define YYSTYPE Value
+extern "C" int yylex();
+extern void yyerror(const char* msg);
+%}
+
+%token ID
+%token IF "#if"
+%token ELSE "#else"
+%token ELIF "#elif"
+%token ENDIF "#endif"
+%token DEFINED "defined"
+%token IFDEF "#ifdef"
+%token IFNDEF "#ifndef"
+%token PRIMARY 
+%token TRAIL
+%token <operator> LOR "||"
+%token <operator> LAND "&&"
+%token <operator> IOR "|"
+%token <operator> XOR "^"
+%token <operator> AND "&"
+%token <operator> EQUAL "=="
+%token <operator> NOT_EQUAL "!="
+%token <operator> LESS "<"
+%token <operator> GREATER ">"
+%token <operator> LESS_OR_EQUAL "<="
+%token <operator> GREATER_OR_EQUAL ">="
+%token <operator> LSHIFT "<<"
+%token <operator> RSHIFT ">>"
+%token <operator> ADD "+"
+%token <operator> SUB "-"
+%token <operator> MUL "*"
+%token <operator> DIV "/"
+%token <operator> REM "%"
+%token <operator> LNOT "!"
+%token <operator> NOT "~"
+%token LPAREN "("
+%token RPAREN ")"
+
+%left '?'
+%left "||"
+%left "&&"
+%left "|"
+%left "^"
+%left "&"
+%left "==" "!="
+%left "<" ">" "<=" ">="
+%left "<<" ">>"
+%left "+" "-"
+%left "*" "/" "%"
+
+%%
+
+file: nonempty
+    | 
+    ;
+
+nonempty
+    : section
+    | nonempty section
+    ;
+
+section
+    : startif file elsechain
+    ;
+
+startif
+    : "#if" {$$=tok();} expr trail {if_($2,$3,$4); $$=NULL;}
+    | "#ifdef" {$$=tok();} id trail {ifdef($2,$3,$4,true); $$=NULL;}
+    | "#ifndef" {$$=tok();} id trail {ifdef($2,$3,$4,false); $$=NULL;}
+    ;
+
+elsechain
+    : elif file elsechain
+    | else file endif
+    | endif
+    ;
+
+elif : "#elif" {$$=tok();} expr trail {elif($2,$3,$4); $$=NULL;}
+
+else : "#else" {$$=tok();} trail {else_($2,$3); $$=NULL;}
+
+endif: "#endif" {$$=tok();} trail {endif($2,$3); $$=NULL;}
+
+expr 
+    : primary
+    | expr '?' {$$=tok();} expr ':' {$$=tok();} expr {$$=ternary_op($1,$3,$4,$6,$7);} %prec '?'
+    | expr "||" {$$=tok();} expr {$$=lor($1,$3,$4);}
+    | expr "&&" {$$=tok();} expr {$$=land($1,$3,$4);}
+    | expr "|" {$$=tok();} expr {$$=binary_op($1,$3,$4,IOR);}
+    | expr "^" {$$=tok();} expr {$$=binary_op($1,$3,$4,XOR);}
+    | expr "&" {$$=tok();} expr {$$=binary_op($1,$3,$4,AND);}
+    | expr "==" {$$=tok();} expr {$$=binary_op($1,$3,$4,EQUAL);}
+    | expr "!=" {$$=tok();} expr {$$=binary_op($1,$3,$4,NOT_EQUAL);}
+    | expr "<" {$$=tok();} expr {$$=binary_op($1,$3,$4,LESS);}
+    | expr ">" {$$=tok();} expr {$$=binary_op($1,$3,$4,GREATER);}
+    | expr "<=" {$$=tok();} expr {$$=binary_op($1,$3,$4,LESS_OR_EQUAL);}
+    | expr ">=" {$$=tok();} expr {$$=binary_op($1,$3,$4,GREATER_OR_EQUAL);}
+    | expr "<<" {$$=tok();} expr {$$=binary_op($1,$3,$4,LSHIFT);}
+    | expr ">>" {$$=tok();} expr {$$=binary_op($1,$3,$4,RSHIFT);}
+    | expr "+" {$$=tok();} expr {$$=binary_op($1,$3,$4,ADD);}
+    | expr "-" {$$=tok();} expr {$$=binary_op($1,$3,$4,SUB);}
+    | expr "*" {$$=tok();} expr {$$=binary_op($1,$3,$4,MUL);}
+    | expr "/" {$$=tok();} expr {$$=binary_op($1,$3,$4,DIV);}
+    | expr "%" {$$=tok();} expr {$$=binary_op($1,$3,$4,REM);}
+    ;
+
+primary
+    : id {$$=expand($1);} 
+    | "!" {$$=tok();} primary {$$=unary_arith_op($2,$3,'!');}
+    | "~" {$$=tok();} primary {$$=unary_arith_op($2, $3,'~');}
+    | "-" {$$=tok();} primary {$$=unary_arith_op($2, $3,'-');}
+    | "+" {$$=tok();} primary {$$=unary_arith_op($2, $3,'+');}
+    | lparen expr rparen {$$=paren($1,$2,$3);}
+    | id lparen arglist rparen {$$=cat($1,$2,$3,$4);}
+    | defined lparen id rparen {$$=defined($1,$2,$3,$4);}
+    | defined id {$$=defined($1,NULL,$2,NULL);}
+    | PRIMARY {$$=tok();}
+    ;
+
+arglist
+    : expr
+    | arglist comma expr {$$=cat($1,$2,$3);}
+    |
+
+trail: TRAIL {$$=tok();};
+
+defined: "defined" {$$=tok();}
+
+comma : ',' {$$=tok();};
+
+lparen : "(" {$$=tok();};
+
+rparen : ")" {$$=tok();};
+
+id  : ID {$$=tok();};
