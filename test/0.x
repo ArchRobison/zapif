@@ -15,3 +15,15 @@ yes or yet
 #else
 no or no
 #endif
+
+#if 0x0
+yes hex
+#else
+no hex
+#endif
+
+#if 00
+yes octal
+#else
+no octal
+#endif

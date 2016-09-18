@@ -13,9 +13,9 @@ the command ``zapif -Dbar=1 -Dquod=0 demo.c` will produce:
 void f() {}
 #endif
 ```
-When simplifying a preprocessor directive, 
-`zapif` tries to preserve whitespace and the original form 
-of numbers when simplifying.
+When simplifying a preprocessor directive, `zapif` tries to preserve whitespace
+and the original form of numerals when simplifying.  Literal numerals such as
+`0` and `1` are treated as unknown values unless the `-k` option is present.
 
 Examples of the simplifications that `zapif` knows:
 * 0 || y -> y
@@ -27,17 +27,19 @@ Algebraic simplifications are limited to ones that seem to be useful for real he
 
 # Prequisites 
 
-I developed `zapif` on MacOS, but it should build on Linux without difficulty.
-To build `zapif` you will need:
+I developed `zapif` on Mac OS X, but it should build on Linux without 
+difficulty.  To build `zapif` you will need:
 
-* flex
-* bison
+* flex 2.5
+* bison 2.3
 * a C++11 compiler.  The default is `g++`.
 
 # Building `zapif`
 
 1. `cd build`
 2. `make`
+
+The 2nd step builds the executable and tests it.  If the test fails, you will see output from `diff`.
 
 # Using `zapif`
 
