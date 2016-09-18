@@ -31,7 +31,7 @@ void createUndef(const std::string& symbol) {
 
 static bool tryParseInt( const std::string& s, Chunk::integer_type& x ) {
     char *endptr;
-    x = std::strtol(s.c_str(), &endptr, 0);
+    x = std::strtoll(s.c_str(), &endptr, 0);
     return *endptr==0;
 }
 
@@ -107,7 +107,7 @@ void print(Value x) {
         note("}");
     } else if( x->isInt() ) {
         note("{value ");
-        printf("%ld",x->my_value);
+        printf("%lld",x->my_value);
         note("}");
     } else {
         note("{cons ");

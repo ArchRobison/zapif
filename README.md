@@ -51,13 +51,13 @@ Output always goes to `stdout`.
 
 The recognized options are:
 
-* `-Dfoo=42` - treat `foo` as having the value 42.
+* `-Dfoo=42` - treat `foo` as having the value `42`.
 * `-Dfoo` - same as `-Dfoo=1`
 * `-Ufoo` - treat `foo` as undefined.  The preprocessor expression `defined(foo)` will evaluate to 0, and `foo` will be treated as 0 in other preprocessor expressions.
 * `-k` - interpret numerals in preprocessor expressions.  Without this option, numerals such as `0` are treated as unknown values.
 
 ## Limitations
 
-* Numbers are recognized only if they fit in a C++ `long`
-  and follow the C conventions for decimal, octal, or hexadecimal,
-  without any suffixes.
+* Numerals are recognized as having values only if they fit in a C++
+  `long long`, follow the C conventions for decimal, octal, or hexadecimal,
+  and do not have any suffixes.
