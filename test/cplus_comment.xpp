@@ -1,1 +1,11 @@
 yes
+
+// foo '\\', '\t', '\n', '"', bar
+
+// really '\\' \
+   long comment
+line above is in comment, but not this line
+
+// next line is continuation line \
+#if one
+but not this line

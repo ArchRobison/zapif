@@ -16,7 +16,8 @@ static int old_state;
 
 %}
 %x preproc
-%x comment
+%x c_comment
+%x cplus_comment
 %x quote
 %option yylineno
 
@@ -35,9 +36,11 @@ HASH ^[ \t]*#[ \t]*
     {HASH}ifndef[ \t]+ {BEGIN(preproc); RET(IFNDEF);}
     {HASH}.            {emit_code();}
 
-    "/*"    {transition(INITIAL,comment);}
+    "/*"    {transition(INITIAL,c_comment);}
 
     "\""    {transition(INITIAL,quote);}
+
+    "//"    {transition(INITIAL,cplus_comment);}
 
     (.|\n)  {emit_code();}
 }
@@ -48,9 +51,15 @@ HASH ^[ \t]*#[ \t]*
     .           {munch();}
 }
 
-<comment>{
-    "*/"    {BEGIN(old_state); munch(); }
+<c_comment>{
+    "*/"    {BEGIN(old_state); munch();}
     (.|\n)  {munch();}
+}
+
+<cplus_comment>{
+    \\\n {munch();}
+    \n {BEGIN(old_state); munch();}
+    . {munch();}
 }
 
 <preproc>{
@@ -83,7 +92,7 @@ HASH ^[ \t]*#[ \t]*
     \)              {RET(RPAREN);}
     [A-Za-z_0-9]+   {RET(ID);}   /* Really id or numeral */
     ("//".*)?(\n|\r)? {BEGIN(INITIAL); RET(TRAIL);}
-    [ \t]*"/*"      {transition(preproc,comment);}
+    [ \t]*"/*"      {transition(preproc,c_comment);}
     {SPACE}         {grow_tok();}
     <<EOF>>         {RET(TRAIL);}
 
