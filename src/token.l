@@ -55,7 +55,8 @@ HASH ^[ \t]*#[ \t]*
 }
 
 <squote>{
-    \'          {BEGIN(old_state); munch();}
+    \'          {if(old_state==preproc) {BEGIN(old_state); RET(ID);}
+                 else munch(); BEGIN(old_state);}
     \\(\'|\\)   {munch();}
     .           {munch();}
 }
@@ -100,29 +101,30 @@ HASH ^[ \t]*#[ \t]*
     \({SPACE}       {RET(LPAREN);}
     \)              {RET(RPAREN);}
     [A-Za-z_0-9]+   {RET(ID);}   /* Really id or numeral */
+    \'              {transition(preproc,squote);}
     ("//".*)?(\n|\r)? {BEGIN(INITIAL); RET(TRAIL);}
     [ \t]*"/*"      {transition(preproc,c_comment);}
     {SPACE}         {grow_tok();}
     <<EOF>>         {RET(TRAIL);}
 
     .           {
-                    if(strlen(yytext)<=1) 
-                        fprintf(stderr,"%d unrecognized char: 0x%X", yylineno, yytext[0]); 
-                    else 
+                    if(strlen(yytext)<=1)
+                        fprintf(stderr,"%d unrecognized char: 0x%X", yylineno, yytext[0]);
+                    else
                        fprintf(stderr,"%d unrecognized string: %s\n", yylineno, yytext);
                 }
 }
 
 %%
 void munch() {
-    if(old_state==INITIAL) 
-        emit_code(); 
-    else 
+    if(old_state==INITIAL)
+        emit_code();
+    else
         grow_tok();
 }
 
 void transition(int from, int to) {
-    old_state=from; 
+    old_state=from;
     BEGIN(to);
     munch();
 }

@@ -15,3 +15,9 @@ keep
 "\\\*"
 
 #define foo bar('x'), bar('"'), bar('#')
+
+#if '\0' == 0   
+retain
+#else
+toss
+#endif
