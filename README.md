@@ -30,8 +30,8 @@ Algebraic simplifications are limited to ones that seem to be useful for real he
 I developed `zapif` on Mac OS X, but it should build on Linux without 
 difficulty.  To build `zapif` you will need:
 
-* flex 2.5
-* bison 2.3
+* flex 2.5 or 2.6
+* bison 2.3 or 3.0
 * a C++11 compiler.  The default is `g++`.
 
 # Building `zapif`
