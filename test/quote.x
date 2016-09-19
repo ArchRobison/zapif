@@ -13,3 +13,5 @@ keep
 "\\*"
 
 "\\\*"
+
+#define foo bar('x'), bar('"'), bar('#')

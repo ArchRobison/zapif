@@ -18,7 +18,8 @@ static int old_state;
 %x preproc
 %x c_comment
 %x cplus_comment
-%x quote
+%x squote
+%x dquote
 %option yylineno
 
 SPACE ([ \t]|\\\n)*
@@ -38,16 +39,24 @@ HASH ^[ \t]*#[ \t]*
 
     "/*"    {transition(INITIAL,c_comment);}
 
-    "\""    {transition(INITIAL,quote);}
+    "\""    {transition(INITIAL,dquote);}
 
     "//"    {transition(INITIAL,cplus_comment);}
+
+    "\'"    {transition(INITIAL,squote);}
 
     (.|\n)  {emit_code();}
 }
 
-<quote>{
+<dquote>{
     \"          {BEGIN(old_state); munch();}
     \\(\"|\\)   {munch();}
+    .           {munch();}
+}
+
+<squote>{
+    \'          {BEGIN(old_state); munch();}
+    \\(\'|\\)   {munch();}
     .           {munch();}
 }
 

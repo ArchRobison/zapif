@@ -21,3 +21,7 @@ keep
 "\\*"
 
 "\\\*"
+
+#ifndef nil
+#define foo bar('x'), bar('"'), bar('#')
+#endif
