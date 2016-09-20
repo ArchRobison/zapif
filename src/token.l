@@ -30,13 +30,15 @@ LEFT_SQUOTE ([LUu]|u8)?\'
 %%
 
 <INITIAL>{
-    {HASH}if[ \t]+     {BEGIN(preproc); RET(IF);}
-    {HASH}elif[ \t]+   {BEGIN(preproc); RET(ELIF);}
-    {HASH}endif        {BEGIN(preproc); RET(ENDIF);}
-    {HASH}else         {BEGIN(preproc); RET(ELSE);}
-    {HASH}ifdef[ \t]+  {BEGIN(preproc); RET(IFDEF);}
-    {HASH}ifndef[ \t]+ {BEGIN(preproc); RET(IFNDEF);}
-    {HASH}.            {emit_code();}
+    {HASH}ifdef[ \t]+       {BEGIN(preproc); RET(IFDEF);}
+    {HASH}ifndef[ \t]+      {BEGIN(preproc); RET(IFNDEF);}
+    {HASH}if[ \t]+          {BEGIN(preproc); RET(IF);}
+    {HASH}if/[[:punct:]]    {BEGIN(preproc); RET(IF);}
+    {HASH}elif[ \t]+        {BEGIN(preproc); RET(ELIF);}
+    {HASH}elif/[[:punct:]]  {BEGIN(preproc); RET(ELIF);}
+    {HASH}endif             {BEGIN(preproc); RET(ENDIF);}
+    {HASH}else              {BEGIN(preproc); RET(ELSE);}
+    {HASH}.                 {emit_code();}
 
     "/*"    {transition(INITIAL,c_comment);}
 
@@ -57,7 +59,7 @@ LEFT_SQUOTE ([LUu]|u8)?\'
 
 <squote>{
     \'          {if(old_state==preproc) {BEGIN(old_state); RET(ID);}
-                 else munch(); BEGIN(old_state);}
+                 else {munch(); BEGIN(old_state);}}
     \\(\'|\\)   {munch();}
     .           {munch();}
 }
