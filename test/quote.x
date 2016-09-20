@@ -21,3 +21,19 @@ retain
 #else
 toss
 #endif
+
+#if L'A' == 0
+upper case L
+#endif
+
+#if U'A' == 0
+upper case U
+#endif
+
+#if u'A' == 0
+lower case u
+#endif
+
+#if u8'A' == 0
+lower case u8
+#endif

@@ -25,6 +25,7 @@ static int old_state;
 SPACE ([ \t]|\\\n)*
 PAREN_DEBRIS [ \t]*\([^)]*\)
 HASH ^[ \t]*#[ \t]*
+LEFT_SQUOTE ([LUu]|u8)?\'
 
 %%
 
@@ -43,7 +44,7 @@ HASH ^[ \t]*#[ \t]*
 
     "//"    {transition(INITIAL,cplus_comment);}
 
-    "\'"    {transition(INITIAL,squote);}
+    {LEFT_SQUOTE}   {transition(INITIAL,squote);}
 
     (.|\n)  {emit_code();}
 }
@@ -101,7 +102,7 @@ HASH ^[ \t]*#[ \t]*
     \({SPACE}       {RET(LPAREN);}
     \)              {RET(RPAREN);}
     [A-Za-z_0-9]+   {RET(ID);}   /* Really id or numeral */
-    \'              {transition(preproc,squote);}
+    {LEFT_SQUOTE}   {transition(preproc,squote);}
     ("//".*)?(\n|\r)? {BEGIN(INITIAL); RET(TRAIL);}
     [ \t]*"/*"      {transition(preproc,c_comment);}
     {SPACE}         {grow_tok();}
