@@ -9,6 +9,7 @@ static std::map<std::string,Chunk> RhsMap;
 static std::map<std::string,Value> LookupMap;
 static std::map<std::pair<Value,Value>,Chunk> CatMap;
 
+//! Try to interpret text input as integer values when applicable.
 bool interpretConstants;
 
 const Chunk* Chunk::lookup() const {
@@ -51,7 +52,7 @@ bool Chunk::asInt(integer_type& x, bool relaxed) const {
     return relaxed && (y->my_kind & text) && tryParseInt(y->my_str,x);
 }
  
-Value Chunk::make(int x) {
+Value Chunk::make(integer_type x) {
     auto& i = IntMap[x]; if( i.my_kind==Chunk::fresh ) {
         i.my_kind = Chunk::integer;
         i.my_value = x;

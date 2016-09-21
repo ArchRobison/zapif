@@ -118,7 +118,7 @@ Value ternary_op( Value x, Value op, Value y, Value colon, Value z ) {
 // See http://stackoverflow.com/questions/14418560 for why yymore() cannot be used.
 static std::string buffer;
 
-extern "C" void grow_tok() {
+void grow_tok() {
     buffer += yytext; 
 }
 
