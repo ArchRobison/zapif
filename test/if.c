@@ -29,3 +29,20 @@ no one with minus
 #eliff 1
 #if1
 #elif2
+
+#if/*'*/two==2 && foo
+conditional on foo
+#endif
+
+#if/*"*//*'*/two==2 && foo
+conditional on foo again
+#endif 
+
+#if /*"*/ /*'*/ two==2 && foo
+conditional on foo yet again
+#endif
+
+#if\
+/*"*/two==2 && foo
+conditional on foo on new line
+#endif

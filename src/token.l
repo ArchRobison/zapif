@@ -13,11 +13,13 @@ void emit_code();
 static void munch();
 void transition(int from, int to);
 static int old_state;
+static int if_tok_ret;
 
 %}
 %x preproc
 %x c_comment
 %x cplus_comment
+%x if_tok
 %x squote
 %x dquote
 %option yylineno
@@ -26,16 +28,14 @@ SPACE ([ \t]|\\\n)*
 PAREN_DEBRIS [ \t]*\([^)]*\)
 HASH ^[ \t]*#[ \t]*
 LEFT_SQUOTE ([LUu]|u8)?\'
-
+IF_DELIM [^a-zA-Z0-9_]
 %%
 
 <INITIAL>{
     {HASH}ifdef[ \t]+       {BEGIN(preproc); RET(IFDEF);}
     {HASH}ifndef[ \t]+      {BEGIN(preproc); RET(IFNDEF);}
-    {HASH}if[ \t]+          {BEGIN(preproc); RET(IF);}
-    {HASH}if/[[:punct:]]    {BEGIN(preproc); RET(IF);}
-    {HASH}elif[ \t]+        {BEGIN(preproc); RET(ELIF);}
-    {HASH}elif/[[:punct:]]  {BEGIN(preproc); RET(ELIF);}
+    {HASH}if/{IF_DELIM}     {if_tok_ret=IF; transition(if_tok,if_tok);}
+    {HASH}elif/{IF_DELIM}   {if_tok_ret=ELIF; transition(if_tok,if_tok);}
     {HASH}endif             {BEGIN(preproc); RET(ENDIF);}
     {HASH}else              {BEGIN(preproc); RET(ELSE);}
     {HASH}.                 {emit_code();}
@@ -49,6 +49,13 @@ LEFT_SQUOTE ([LUu]|u8)?\'
     {LEFT_SQUOTE}   {transition(INITIAL,squote);}
 
     (.|\n)  {emit_code();}
+}
+
+<if_tok>{
+   [ \t]    {munch();}
+   "\\\n"   {munch();}
+   "/*"     {transition(if_tok,c_comment);}
+   ""/[^ ]  {BEGIN(preproc); RET(if_tok_ret);}
 }
 
 <dquote>{
