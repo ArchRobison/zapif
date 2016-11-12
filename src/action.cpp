@@ -131,9 +131,18 @@ Value tok() {
 
 static std::vector<Value> enable;
 
+static bool propagate() {
+    if( enable.size()>=2 ) {
+        Value outer = enable.end()[-2];
+        if( *outer==0 )
+            enable.back() = outer;
+    }
+    return !enable.back()->isInt();
+}
+
 void if_( Value if_tok, Value x, Value trail ) {
     enable.push_back(x);
-    if( !x->isInt() ) 
+    if( propagate() )
         print(if_tok,x,trail);
 }
 
@@ -142,21 +151,21 @@ void ifdef(Value op, Value id, Value trail, bool isIfDef) {
     if( const Chunk* def = x->lookup() ) 
         x = Chunk::make(def->isUndef() != isIfDef);
     enable.push_back(x);
-    if( !x->isInt() )
+    if( propagate() ) 
         print(op,id,trail);
 }
 
 void elif( Value elif, Value x, Value trail ) {
     enable.back() = x;
-    if( !x->isInt() )
+    if( propagate() )
         print(elif,x,trail);
 }
 
 void else_( Value else_tok, Value trail ) {
     Value x = enable.back();
-    if( x->isInt() )
+    if( x->isInt() ) 
         enable.back() = Chunk::make(*x==0);
-    else
+    if( propagate() )
         print(else_tok, trail);
 }
 
