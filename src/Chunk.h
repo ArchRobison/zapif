@@ -2,6 +2,18 @@
 #include <cassert>
 #include "action.h"
 
+/** \brief A pair of bits dnoting which part of if-else to keep.
+
+    Meaning of values:
+    0 - keep neither
+    1 - keep "then"
+    2 - keep "else" and supress "#else"
+    5 - keep "then" ana emit "#endif"
+    6 - keep "else" and emit "#else"
+    7 - keep both
+  */
+typedef unsigned char bit_triple_type;
+
 /** \brief A chunk of text.
 
     The representation may be string, number, both,
@@ -24,6 +36,8 @@ public:
     bool operator==(int y) const {return isInt() && my_value==y;}
     //! Return false iff *this has integer value equal to y.
     bool operator!=(int y) const {return isInt() && my_value!=y;}
+    //! Return triple of bits indicating whether *this is ==0, !=0.
+    bit_triple_type bit_triple() const {return isInt() ? my_value!=0 ? 1 : 2 : 7;}
     //! If *this is defined (via -D or -U), return its definition.
     const Chunk* lookup() const;
     //! Make a pure integer, i.e. Value without a text representation.
@@ -44,6 +58,7 @@ public:
     friend void createUndef(const std::string& symbol);
     friend Value cat( Value x, Value y );
     friend void print(Value x);
+    friend void print_with_replacement(Value x, size_t pos, size_t len, const char* replacement);
 private:
     enum kind_flags {
         fresh=0,

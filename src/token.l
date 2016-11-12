@@ -3,6 +3,7 @@
 #include <stdio.h>
 void grow_tok();
 void emit_code();
+void mark_elif();
 #if 0
 #define RET(x) fprintf(stderr,"[%s]",#x); return x;
 #else
@@ -35,7 +36,7 @@ IF_DELIM [^a-zA-Z0-9_]
     {HASH}ifdef[ \t]+       {BEGIN(preproc); RET(IFDEF);}
     {HASH}ifndef[ \t]+      {BEGIN(preproc); RET(IFNDEF);}
     {HASH}if/{IF_DELIM}     {if_tok_ret=IF; transition(if_tok,if_tok);}
-    {HASH}elif/{IF_DELIM}   {if_tok_ret=ELIF; transition(if_tok,if_tok);}
+    {HASH}elif/{IF_DELIM}   {if_tok_ret=ELIF; transition(if_tok,if_tok); mark_elif();}
     {HASH}endif             {BEGIN(preproc); RET(ENDIF);}
     {HASH}else              {BEGIN(preproc); RET(ELSE);}
     {HASH}.                 {emit_code();}

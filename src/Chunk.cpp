@@ -40,7 +40,7 @@ bool Chunk::asInt(integer_type& x, bool relaxed) const {
     const Chunk* y;
     if( isInt() )
         y = this;
-    else if( auto z = lookup() ) 
+    else if( auto z = lookup() )
         // y is an undef
         y = z;
     else
@@ -48,12 +48,13 @@ bool Chunk::asInt(integer_type& x, bool relaxed) const {
     if( y->isInt() ) {
         x = my_value;
         return true;
-    } 
+    }
     return relaxed && (y->my_kind & text) && tryParseInt(y->my_str,x);
 }
- 
+
 Value Chunk::make(integer_type x) {
-    auto& i = IntMap[x]; if( i.my_kind==Chunk::fresh ) {
+    auto& i = IntMap[x];
+    if( i.my_kind==Chunk::fresh ) {
         i.my_kind = Chunk::integer;
         i.my_value = x;
     }
@@ -118,3 +119,10 @@ void print(Value x) {
     }
 }
 
+void print_with_replacement(Value x, size_t pos, size_t len, const char* replacement) {
+    assert( x->my_kind&Chunk::text );
+    assert( pos+len<=x->my_str.size() );
+    note("{repl ");
+    printf("%s%s%s", x->my_str.substr(0,pos).c_str(), replacement, x->my_str.c_str()+pos+len);
+    note("}");
+}

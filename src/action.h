@@ -12,6 +12,8 @@ extern "C" {
     void grow_tok();
     /** \brief do grow_tok(), output the string buffer if enabled, and clear the buffer. */
     void emit_code();
+    /** \brief Record where elif token is in token buffer. */
+    void mark_elif();
     /**@}*/
 }
 

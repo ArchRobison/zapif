@@ -7,7 +7,7 @@
 extern char* yytext;
 
 Value expand( Value x ) {
-    if( const Chunk* def = x->lookup() ) 
+    if( const Chunk* def = x->lookup() )
         return def;
     return x;
 }
@@ -16,7 +16,7 @@ Value expand( Value x ) {
 // Here op="defined", left="(", right=")" with neighboring whitespace.
 Value defined( Value op, Value left, Value x, Value right ) {
     assert(!left==!right);
-    if( const Chunk* def = x->lookup() ) 
+    if( const Chunk* def = x->lookup() )
         return Chunk::make(!def->isUndef());
     else if( left )
         // Have parentheses
@@ -27,7 +27,7 @@ Value defined( Value op, Value left, Value x, Value right ) {
 }
 
 Value paren( Value left, Value x, Value right ) {
-    if( x->isInt() ) 
+    if( x->isInt() )
         // Propagate the value
         return x;
     // Retain all text
@@ -119,7 +119,7 @@ Value ternary_op( Value x, Value op, Value y, Value colon, Value z ) {
 static std::string buffer;
 
 void grow_tok() {
-    buffer += yytext; 
+    buffer += yytext;
 }
 
 Value tok() {
@@ -129,56 +129,72 @@ Value tok() {
     return x;
 }
 
-static std::vector<Value> enable;
+static size_t elif_pos;
 
-static bool propagate() {
-    if( enable.size()>=2 ) {
-        Value outer = enable.end()[-2];
-        if( *outer==0 )
-            enable.back() = outer;
-    }
-    return !enable.back()->isInt();
+void mark_elif() {
+    elif_pos = buffer.size()-4;
+    assert(buffer.substr(elif_pos)=="elif");
+}
+
+static std::vector<bit_triple_type> enable {3};
+
+static bool push_level(Value x) {
+    bit_triple_type outer = enable.back();
+    enable.push_back(outer & 1 ? x->bit_triple() : 0);
+    return enable.back()==7;
 }
 
 void if_( Value if_tok, Value x, Value trail ) {
-    enable.push_back(x);
-    if( propagate() )
+    if( push_level(x) )
         print(if_tok,x,trail);
 }
 
 void ifdef(Value op, Value id, Value trail, bool isIfDef) {
     Value x = id;
-    if( const Chunk* def = x->lookup() ) 
+    if( const Chunk* def = x->lookup() )
         x = Chunk::make(def->isUndef() != isIfDef);
-    enable.push_back(x);
-    if( propagate() ) 
+    if( push_level(x) )
         print(op,id,trail);
 }
 
 void elif( Value elif, Value x, Value trail ) {
-    enable.back() = x;
-    if( propagate() )
-        print(elif,x,trail);
+    bit_triple_type yp = enable.back();
+    if( yp & 2 ) {
+        bit_triple_type xp = x->bit_triple();
+        enable.back() = xp | (yp&4);
+        if( xp==7 ) {
+            if( (yp&6)==6 ) {
+                print(elif, x, trail);
+            } else if( yp==2 ) {
+                print_with_replacement(elif, elif_pos, 4, "if");
+                print(x,trail);
+            }
+        } else if( xp==1 && (yp&6)==6 ) {
+            print_with_replacement(elif, elif_pos, 4, "else");
+            print(trail);
+        }
+    } else {
+        enable.back() = yp & ~3;
+    }
 }
 
 void else_( Value else_tok, Value trail ) {
-    Value x = enable.back();
-    if( x->isInt() ) 
-        enable.back() = Chunk::make(*x==0);
-    if( propagate() )
+    bit_triple_type xp = enable.back();
+    if( (xp&6)==6 )
         print(else_tok, trail);
+    enable.back() = (xp&4) | (xp&3)>>1;
 }
 
 void endif( Value endif_tok, Value trail ) {
-    Value x = enable.back();
+    bit_triple_type x = enable.back();
     enable.pop_back();
-    if( !x->isInt() ) 
+    if( x&4 )
         print(endif_tok, trail);
 }
 
 void emit_code() {
     grow_tok();
-    if( enable.empty() || !(*enable.back()==0))
+    if( enable.back()&1 )
         printf("%s",buffer.c_str());
     buffer.clear();
 }
