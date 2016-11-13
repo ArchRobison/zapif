@@ -9,9 +9,9 @@ extern "C" {
     @{*/
 
     /** \brief Append yytext to the current string buffer. */
-    void grow_tok();
+    void growTok();
     /** \brief do grow_tok(), output the string buffer if enabled, and clear the buffer. */
-    void emit_code();
+    void emitCode();
     /** \brief Record where elif token is in token buffer. */
     void mark_elif();
     /**@}*/
@@ -29,15 +29,15 @@ typedef const Chunk* Value;
 @{*/
 
 //! Evaluate x?y:z
-Value ternary_op( Value x, Value op, Value y, Value colon, Value z );
+Value ternaryOp( Value x, Value op, Value y, Value colon, Value z );
 //! Evaluate x||y.
 Value lor( Value x, Value op, Value y );
 //! Evaluate x&&y.
 Value land( Value x, Value op, Value y );
 //! Evaluate a unary operation denoted by the given char.
-Value unary_arith_op( Value op, Value y, char operation );
+Value unaryArithOp( Value op, Value y, char operation );
 //! Evaluate x operation y, where the operation is ADD, SUB, etc.
-Value binary_op( Value x, Value op, Value y, int operation );
+Value binaryOp( Value x, Value op, Value y, int operation );
 //! Evaluate (x).
 Value paren( Value left, Value x, Value right );
 //! Evaluate given symbol, expanding it per any -D or -U options.
@@ -61,6 +61,9 @@ void endif( Value endif_tok, Value trail );
 void ifdef(Value op, Value id, Value trail, bool isIfDef);
 //! Get current string buffer as a text Value, and clear the buffer.
 Value tok();
+
+//! Mark value as being safe to omit any enclosing parentheses.
+void markPrimary(Value x);
 
 //! Concatenate x and y.
 Value cat(Value x, Value y);

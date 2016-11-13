@@ -6,6 +6,10 @@
 
 extern char* yytext;
 
+void markPrimary( Value x ) {
+    x->setIsPrimary();
+}
+
 Value expand( Value x ) {
     if( const Chunk* def = x->lookup() )
         return def;
@@ -27,14 +31,13 @@ Value defined( Value op, Value left, Value x, Value right ) {
 }
 
 Value paren( Value left, Value x, Value right ) {
-    if( x->isInt() )
-        // Propagate the value
-        return x;
+    if( Value y = wasSimplified(x) )
+        return y;
     // Retain all text
     return cat(left,x,right);
 }
 
-Value unary_arith_op(Value op, Value x, char operation) {
+Value unaryArithOp(Value op, Value x, char operation) {
     Chunk::integer_type i;
     if( x->asInt(i,false) ) {
         Chunk::integer_type k;
@@ -51,15 +54,15 @@ Value unary_arith_op(Value op, Value x, char operation) {
 }
 
 Value lor(Value x, Value op, Value y) {
-    if( *x==0 ) return y;
-    if( *y==0 ) return x;
+    if( *x==0 ) return markSimplified(y);
+    if( *y==0 ) return markSimplified(x);
     if( *x!=0 || *y!=0 ) return Chunk::make(1);
     return cat(x,op,y);
 }
 
 Value land(Value x, Value op, Value y) {
-    if( *x!=0 ) return y;
-    if( *y!=0 ) return x;
+    if( *x!=0 ) return markSimplified(y);
+    if( *y!=0 ) return markSimplified(x);
     if( *x==0 || *y==0 ) return Chunk::make(0);
     return cat(x,op,y);
 }
@@ -71,7 +74,7 @@ static bool asInts(Value x, Value y, Chunk::integer_type& i, Chunk::integer_type
     return false;
 }
 
-Value binary_op( Value x, Value op, Value y, int operation ) {
+Value binaryOp( Value x, Value op, Value y, int operation ) {
     // Do algebraic simplifications.  Though there are many possible,
     // the code here handles only ones which seem to have practical
     // use in real header files.
@@ -109,21 +112,21 @@ concat:
     return cat(x,op,y);
 }
 
-Value ternary_op( Value x, Value op, Value y, Value colon, Value z ) {
-    if( *x!=0 ) return y;
-    if( *x==0 ) return z;
+Value ternaryOp( Value x, Value op, Value y, Value colon, Value z ) {
+    if( *x!=0 ) return markSimplified(y);
+    if( *x==0 ) return markSimplified(z);
     return cat(x,op,y,colon,z);
 }
 
 // See http://stackoverflow.com/questions/14418560 for why yymore() cannot be used.
 static std::string buffer;
 
-void grow_tok() {
+void growTok() {
     buffer += yytext;
 }
 
 Value tok() {
-    grow_tok();
+    growTok();
     Value x = Chunk::make(buffer, Chunk::as_text);
     buffer.clear();
     return x;
@@ -166,11 +169,11 @@ void elif( Value elif, Value x, Value trail ) {
             if( (yp&6)==6 ) {
                 print(elif, x, trail);
             } else if( yp==2 ) {
-                print_with_replacement(elif, elif_pos, 4, "if");
+                printWithReplacement(elif, elif_pos, 4, "if");
                 print(x,trail);
             }
         } else if( xp==1 && (yp&6)==6 ) {
-            print_with_replacement(elif, elif_pos, 4, "else");
+            printWithReplacement(elif, elif_pos, 4, "else");
             print(trail);
         }
     } else {
@@ -192,8 +195,8 @@ void endif( Value endif_tok, Value trail ) {
         print(endif_tok, trail);
 }
 
-void emit_code() {
-    grow_tok();
+void emitCode() {
+    growTok();
     if( enable.back()&1 )
         printf("%s",buffer.c_str());
     buffer.clear();

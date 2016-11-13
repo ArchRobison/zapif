@@ -54,13 +54,16 @@ public:
       * \param mk: context
       */
     static Value make(const std::string& t, makeKind mk);
+    void setIsPrimary() const {is_primary=true;}
     friend void createDef(const std::string& symbol, const std::string& value);
     friend void createUndef(const std::string& symbol);
     friend Value cat( Value x, Value y );
     friend void print(Value x);
-    friend void print_with_replacement(Value x, size_t pos, size_t len, const char* replacement);
+    friend void printWithReplacement(Value x, size_t pos, size_t len, const char* replacement);
+    friend Value markSimplified(Value x);
+    friend Value wasSimplified(Value x);
 private:
-    enum kind_flags {
+    enum kind_flags: char {
         fresh=0,
         integer=1,      //!< my_value is valid
         text=2,         //!< my_str is valid
@@ -69,6 +72,7 @@ private:
         cons=8          //!< my_left and my_right are valid
     };
     kind_flags my_kind;
+    mutable bool is_primary = false;
     integer_type my_value;
     std::string my_str;
     Value my_left;

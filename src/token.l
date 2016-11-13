@@ -1,8 +1,8 @@
 %{
 #include "gram.tab.hpp"
 #include <stdio.h>
-void grow_tok();
-void emit_code();
+void growTok();
+void emitCode();
 void mark_elif();
 #if 0
 #define RET(x) fprintf(stderr,"[%s]",#x); return x;
@@ -39,7 +39,7 @@ IF_DELIM [^a-zA-Z0-9_]
     {HASH}elif/{IF_DELIM}   {if_tok_ret=ELIF; transition(if_tok,if_tok); mark_elif();}
     {HASH}endif             {BEGIN(preproc); RET(ENDIF);}
     {HASH}else              {BEGIN(preproc); RET(ELSE);}
-    {HASH}.                 {emit_code();}
+    {HASH}.                 {emitCode();}
 
     "/*"    {transition(INITIAL,c_comment);}
 
@@ -49,7 +49,7 @@ IF_DELIM [^a-zA-Z0-9_]
 
     {LEFT_SQUOTE}   {transition(INITIAL,squote);}
 
-    (.|\n)  {emit_code();}
+    (.|\n)  {emitCode();}
 }
 
 <if_tok>{
@@ -115,7 +115,7 @@ IF_DELIM [^a-zA-Z0-9_]
     {LEFT_SQUOTE}   {transition(preproc,squote);}
     ("//".*)?(\n|\r)? {BEGIN(INITIAL); RET(TRAIL);}
     [ \t]*"/*"      {transition(preproc,c_comment);}
-    {SPACE}         {grow_tok();}
+    {SPACE}         {growTok();}
     <<EOF>>         {RET(TRAIL);}
 
     .           {
@@ -129,9 +129,9 @@ IF_DELIM [^a-zA-Z0-9_]
 %%
 void munch() {
     if(old_state==INITIAL)
-        emit_code();
+        emitCode();
     else
-        grow_tok();
+        growTok();
 }
 
 void transition(int from, int to) {

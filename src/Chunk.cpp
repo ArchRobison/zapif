@@ -30,6 +30,29 @@ void createUndef(const std::string& symbol) {
     LookupMap[symbol] = Chunk::make(symbol, Chunk::as_undef);
 }
 
+static Chunk simplifiedMarker;
+
+Value markSimplified(Value x) {
+    if( !x->isInt() && x->is_primary ) {
+        Chunk* sm = &simplifiedMarker;
+        // Lazy initialization
+        if( sm->my_kind==Chunk::fresh ) 
+            sm->my_kind = Chunk::text;
+        return cat(sm, x);
+    }
+    return x;
+}
+
+Value wasSimplified(Value x) {
+    if( x->isInt() )
+        return x;
+    if( x->my_left==&simplifiedMarker ) {
+        assert(x->my_kind==Chunk::cons);
+        return x->my_right;
+    }
+    return nullptr;
+}
+
 static bool tryParseInt( const std::string& s, Chunk::integer_type& x ) {
     char *endptr;
     x = std::strtoll(s.c_str(), &endptr, 0);
@@ -119,7 +142,7 @@ void print(Value x) {
     }
 }
 
-void print_with_replacement(Value x, size_t pos, size_t len, const char* replacement) {
+void printWithReplacement(Value x, size_t pos, size_t len, const char* replacement) {
     assert( x->my_kind&Chunk::text );
     assert( pos+len<=x->my_str.size() );
     note("{repl ");
