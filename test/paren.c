@@ -31,3 +31,9 @@
 
 #if ((zero || C) && one)
 #endif
+
+#if (zero ? D : E)
+#endif
+
+#if (one ? F : G)
+#endif
