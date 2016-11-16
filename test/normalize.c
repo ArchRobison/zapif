@@ -35,3 +35,7 @@ Line above should become #ifndef H
 #else
 More text
 #endif
+
+#if !defined(nil)&&!defined(I) /*trailing stuff */
+Line above should become #ifndef I
+#endif

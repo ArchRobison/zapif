@@ -33,3 +33,7 @@ Line above should become #ifndef H
 #else
 More text
 #endif
+
+#ifndef I /*trailing stuff */
+Line above should become #ifndef I
+#endif
