@@ -14,6 +14,15 @@
   */
 typedef unsigned char bit_triple_type;
 
+//! Tags for Chunks with certain syntactic forms.
+enum Tag {
+    misc,
+    defined_with_paren,
+    defined_sans_paren,
+    lnot,
+    primary
+};
+
 /** \brief A chunk of text.
 
     The representation may be string, number, both,
@@ -54,7 +63,12 @@ public:
       * \param mk: context
       */
     static Value make(const std::string& t, makeKind mk);
-    void setIsPrimary() const {is_primary=true;}
+    Value setTag(Tag k) const {my_tag = k; return this;}
+    bool hasTag(Tag k) const {return my_tag==k;}
+    void setIsPrimary() const {
+        if(my_tag==misc)
+            my_tag=primary;
+    }
     friend void createDef(const std::string& symbol, const std::string& value);
     friend void createUndef(const std::string& symbol);
     friend Value cat( Value x, Value y );
@@ -62,6 +76,19 @@ public:
     friend void printWithReplacement(Value x, size_t pos, size_t len, const char* replacement);
     friend Value markSimplified(Value x);
     friend Value wasSimplified(Value x);
+    friend char leftmostChar(Value x);
+    friend char rightmostChar(Value x);
+
+    /** \brief Get value from tree, using index scheme shown below.
+      *       1
+      *     /   \
+      *    2     3
+      *   / \   / \
+      *  4   6 5   7
+      * /|  /| |\  |\
+      *8 C A E 9 D B F
+      */
+    friend Value part(Value x, unsigned index);
 private:
     enum kind_flags: char {
         fresh=0,
@@ -72,7 +99,7 @@ private:
         cons=8          //!< my_left and my_right are valid
     };
     kind_flags my_kind;
-    mutable bool is_primary = false;
+    mutable Tag my_tag = misc;
     integer_type my_value;
     std::string my_str;
     Value my_left;
@@ -96,3 +123,4 @@ void print(Value x, T... rest) {
 }
 
 extern bool interpretConstants;
+extern bool normalizeCond;

@@ -12,6 +12,11 @@ static std::map<std::pair<Value,Value>,Chunk> CatMap;
 //! Try to interpret text input as integer values when applicable.
 bool interpretConstants;
 
+/** Convert following expressions *if* result of simplification:
+    #if defined(X) -> #ifdef X
+    #if !defined(X) -> #ifndef X */
+bool normalizeCond;
+
 const Chunk* Chunk::lookup() const {
     auto i = LookupMap.find(my_str);
     if( i==LookupMap.end() )
@@ -33,10 +38,10 @@ void createUndef(const std::string& symbol) {
 static Chunk simplifiedMarker;
 
 Value markSimplified(Value x) {
-    if( !x->isInt() && x->is_primary ) {
+    if( !x->isInt() && x->my_tag!=misc ) {
         Chunk* sm = &simplifiedMarker;
         // Lazy initialization
-        if( sm->my_kind==Chunk::fresh ) 
+        if( sm->my_kind==Chunk::fresh )
             sm->my_kind = Chunk::text;
         return cat(sm, x);
     }
@@ -117,6 +122,39 @@ Value cat( Value x, Value y ) {
     return &i;
 }
 
+char leftmostChar( Value x ) {
+    while( x->my_kind==Chunk::cons ) {
+        char c = leftmostChar(x->my_left);
+        if(c) return c;
+        x = x->my_right;
+    }
+    if( x->my_kind & Chunk::text )
+        return x->my_str.empty() ? 0 : x->my_str.front();
+    // Return representative char, not actual leftmost char.
+    return '0';
+}
+
+char rightmostChar( Value x ) {
+    while( x->my_kind==Chunk::cons ) {
+        char c = rightmostChar(x->my_right);
+        if(c) return c;
+        x = x->my_left;
+    }
+    if( x->my_kind & Chunk::text )
+        return x->my_str.empty() ? 0 : x->my_str.back();
+    // Return representative char, not actual rightmost char.
+    return '0';
+}
+
+Value part( Value x, unsigned index ) {
+    assert(index>0);
+    for(;index>1;index>>=1) {
+        assert( x->my_kind==Chunk::cons );
+        x = index&1 ? x->my_right : x->my_left;
+    }
+    return x;
+}
+
 static bool annotate = false;
 
 static void note(const char* s) {
@@ -135,7 +173,14 @@ void print(Value x) {
         printf("%lld",x->my_value);
         note("}");
     } else {
-        note("{cons ");
+        note("{");
+        switch(x->my_tag) {
+            case defined_with_paren: note("defined_with_paren "); break;
+            case defined_sans_paren: note("defined_sans_paren "); break;
+            case lnot: note("lnot "); break;
+            default: note("cons ");
+        }
+        assert( x->my_kind&Chunk::cons );
         print(x->my_left);
         print(x->my_right);
         note("}");
@@ -144,8 +189,10 @@ void print(Value x) {
 
 void printWithReplacement(Value x, size_t pos, size_t len, const char* replacement) {
     assert( x->my_kind&Chunk::text );
-    assert( pos+len<=x->my_str.size() );
+    auto& s = x->my_str;
+    assert( pos<=s.size() );
+    assert( len<=pos );
     note("{repl ");
-    printf("%s%s%s", x->my_str.substr(0,pos).c_str(), replacement, x->my_str.c_str()+pos+len);
+    printf("%s%s%s", s.substr(0,pos-len).c_str(), replacement, s.c_str()+pos);
     note("}");
 }

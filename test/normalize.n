@@ -1,0 +1,35 @@
+#ifdef A/* trailing stuff */ 
+Line above should become #ifdef A
+#endif
+
+#ifdef B/* trailing stuff */
+Line above should become #ifdef B
+#endif
+
+#ifndef C/* trailing stuff */
+Line above should become #ifndef C
+#endif
+
+#ifndef D/* trailing stuff */
+Line above should become #ifndef D
+#endif
+
+#ifdef E/* trailing stuff */
+Line above should become #ifdef E, not #ifdefE 
+#endif
+
+#ifndef F/* trailing stuff */
+Line above should become #ifndef F, not #ifdefF
+#endif
+
+#ifdef G
+Line above should become #ifdef G
+#else
+Whatever
+#endif
+
+#ifndef H
+Line above should become #ifndef H
+#else
+More text
+#endif

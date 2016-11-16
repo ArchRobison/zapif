@@ -58,7 +58,7 @@ static int parseOptions(int argc, char* argv[]) {
                 char* rest = skipId(symbol);
                 const char* def;
                 switch( *rest ) {
-                    default: 
+                    default:
                         fprintf(stderr,"option %s garbled\n",a);
                         exit(1);
                     case '=':
@@ -75,6 +75,9 @@ static int parseOptions(int argc, char* argv[]) {
             case 'k':
                 interpretConstants = true;
                 break;
+            case 'n':
+                normalizeCond = true;
+                break;
         }
     }
     return i;
@@ -85,7 +88,7 @@ static FILE* openFile(const char* filename) {
     if( !f ) {
         std::fprintf(stderr, "Cannot open file %s: %s\n", filename, strerror(errno));
         exit(1);
-    } 
+    }
     fileName = filename;
     return f;
 }

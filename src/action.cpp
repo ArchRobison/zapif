@@ -2,6 +2,7 @@
 #include "Chunk.h"
 #include "build/gram.tab.hpp"
 #include <vector>
+#include <cctype>
 #include <cstdio>
 
 extern char* yytext;
@@ -21,18 +22,19 @@ Value expand( Value x ) {
 Value defined( Value op, Value left, Value x, Value right ) {
     assert(!left==!right);
     if( const Chunk* def = x->lookup() )
+        // Simplified
         return Chunk::make(!def->isUndef());
     else if( left )
         // Have parentheses
-        return cat(op,left,x,right);
+        return cat(op,left,x,right)->setTag(defined_with_paren);
     else
         // No parentheses
-        return cat(op,x);
+        return cat(op,x)->setTag(defined_sans_paren);
 }
 
 Value paren( Value left, Value x, Value right ) {
     if( Value y = wasSimplified(x) )
-        return y;
+        return x;
     // Retain all text
     return cat(left,x,right);
 }
@@ -50,7 +52,7 @@ Value unaryArithOp(Value op, Value x, char operation) {
         }
         return Chunk::make(k);
     }
-    return cat(op,x);
+    return cat(op,x)->setTag(lnot);
 }
 
 Value lor(Value x, Value op, Value y) {
@@ -132,11 +134,12 @@ Value tok() {
     return x;
 }
 
-static size_t elif_pos;
+static size_t if_pos;
 
-void mark_elif() {
-    elif_pos = buffer.size()-4;
-    assert(buffer.substr(elif_pos)=="elif");
+void mark_if() {
+    if_pos = buffer.size();
+    assert(if_pos>=2 && buffer.substr(if_pos-2)=="if" ||
+           if_pos>=4 && buffer.substr(if_pos-4)=="elif");
 }
 
 static std::vector<bit_triple_type> enable {3};
@@ -147,9 +150,47 @@ static bool push_level(Value x) {
     return enable.back()==7;
 }
 
+static void printSpaceIfGlueHazard(Value x, Value y) {
+    if( isalnum(rightmostChar(x)) && isalnum(leftmostChar(y)))
+        printf(" ");
+}
+
+static void printIf(Value if_or_elif, size_t len, Value x, Value y, Value trail) {
+    if( normalizeCond && y ) {
+        const char* repl;
+        Value z;
+        if( y->hasTag(lnot) ) {
+            z = part(y,3);
+            repl = "ifndef";
+        } else {
+            z = y;
+            repl = "ifdef";
+        }
+        if( z->hasTag(defined_with_paren) ) {
+            z = part(z,0xB);
+        } else if( z->hasTag(defined_sans_paren) ) {
+            z = part(z,0x3);
+        } else {
+            z = nullptr;
+        }
+        if( z ) {
+            printWithReplacement(if_or_elif, if_pos, len, repl);
+            printSpaceIfGlueHazard(if_or_elif, z);
+            print(z,trail);
+            return;
+        }
+    }
+    printWithReplacement(if_or_elif, if_pos, len, "if");
+    if( y )
+        printSpaceIfGlueHazard(if_or_elif, x);
+    print(x,trail);
+}
+
 void if_( Value if_tok, Value x, Value trail ) {
-    if( push_level(x) )
-        print(if_tok,x,trail);
+    if( push_level(x) ) {
+        Value y = wasSimplified(x);
+        printIf( if_tok, 2, x, y, trail );
+    }
 }
 
 void ifdef(Value op, Value id, Value trail, bool isIfDef) {
@@ -169,11 +210,10 @@ void elif( Value elif, Value x, Value trail ) {
             if( (yp&6)==6 ) {
                 print(elif, x, trail);
             } else if( yp==2 ) {
-                printWithReplacement(elif, elif_pos, 4, "if");
-                print(x,trail);
+                printIf(elif, 4, x, x, trail);
             }
         } else if( xp==1 && (yp&6)==6 ) {
-            printWithReplacement(elif, elif_pos, 4, "else");
+            printWithReplacement(elif, if_pos, 4, "else");
             print(trail);
         }
     } else {

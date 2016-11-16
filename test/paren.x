@@ -37,3 +37,8 @@
 
 #if F
 #endif
+
+/* Should lose surrounding parentheses, but gain a separating space */
+#if G
+#endif
+

@@ -37,3 +37,8 @@
 
 #if (one ? F : G)
 #endif
+
+/* Should lose surrounding parentheses, but gain a separating space */
+#if(G||zero)
+#endif
+

@@ -25,3 +25,11 @@ do
     $ZAPIF -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing -k $input > $TMP
     diff -U 5 "$i" "$TMP"
 done
+
+# Check tests that involve replacments and normalization (-n) 
+for i in $TEST_SRC/*.n
+do
+    input=${i/.n/.c}
+    $ZAPIF -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing -n $input > $TMP
+    diff -U 5 "$i" "$TMP"
+done
