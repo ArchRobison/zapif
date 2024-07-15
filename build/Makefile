@@ -17,6 +17,9 @@ gram.tab.cpp gram.tab.h: gram.ypp action.h
 lex.yy.c: token.l gram.tab.h 
 	flex $<
 
+lex.yy.o: lex.yy.c
+	gcc -c -o $@ $<
+
 %.o: %.cpp
 	$(CPLUS) -c $(CPLUS_FLAGS) -I.. $<
 
