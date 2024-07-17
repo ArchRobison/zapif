@@ -23,6 +23,7 @@ static int if_tok_ret;
 %x if_tok
 %x squote
 %x dquote
+%x raw_string
 %option yylineno
 
 SPACE ([ \t]|\\\n)*
@@ -44,6 +45,8 @@ IF_DELIM [^a-zA-Z0-9_]
     "/*"    {transition(INITIAL,c_comment);}
 
     "\""    {transition(INITIAL,dquote);}
+
+    "R\"("  {transition(INITIAL,raw_string);}
 
     "//"    {transition(INITIAL,cplus_comment);}
 
@@ -70,6 +73,11 @@ IF_DELIM [^a-zA-Z0-9_]
                  else {munch(); BEGIN(old_state);}}
     \\(\'|\\)   {munch();}
     .           {munch();}
+}
+
+<raw_string>{
+    ")\""       {BEGIN(old_state); munch();}
+    (.|\n)      {munch();}
 }
 
 <c_comment>{
