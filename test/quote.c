@@ -47,3 +47,7 @@ lower case u
 #if u8'A' == 0
 lower case u8
 #endif
+
+#if foo("one")
+Literal string in #if
+#endif

@@ -63,7 +63,8 @@ IF_DELIM [^a-zA-Z0-9_]
 }
 
 <dquote>{
-    \"          {BEGIN(old_state); munch();}
+    \"          {if(old_state==preproc) {BEGIN(old_state); RET(ID);}
+                 else {BEGIN(old_state); munch();}}
     \\(\"|\\)   {munch();}
     .           {munch();}
 }
@@ -121,6 +122,7 @@ IF_DELIM [^a-zA-Z0-9_]
     \)              {RET(RPAREN);}
     [A-Za-z_0-9]+   {RET(ID);}   /* Really id or numeral */
     {LEFT_SQUOTE}   {transition(preproc,squote);}
+    "\""            {transition(preproc,dquote);}
     ("//".*)?(\n|\r)? {BEGIN(INITIAL); RET(TRAIL);}
     [ \t]*"/*"      {transition(preproc,c_comment);}
     {SPACE}         {growTok();}
@@ -130,7 +132,7 @@ IF_DELIM [^a-zA-Z0-9_]
                     if(strlen(yytext)<=1)
                         fprintf(stderr,"%d unrecognized char: 0x%X", yylineno, yytext[0]);
                     else
-                       fprintf(stderr,"%d unrecognized string: %s\n", yylineno, yytext);
+                        fprintf(stderr,"%d unrecognized string: %s\n", yylineno, yytext);
                 }
 }
 
