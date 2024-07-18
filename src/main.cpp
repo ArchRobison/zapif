@@ -36,6 +36,8 @@ static char* skipId(char* s) {
     return s;
 }
 
+static bool printVersion = false;
+
 static int parseOptions(int argc, char* argv[]) {
     int i;
     for( i=1; i<argc && argv[i][0]=='-'; ++i ) {
@@ -78,6 +80,9 @@ static int parseOptions(int argc, char* argv[]) {
             case 'n':
                 normalizeCond = true;
                 break;
+            case 'v':
+                printVersion = true;
+                break;
         }
     }
     return i;
@@ -95,6 +100,10 @@ static FILE* openFile(const char* filename) {
 
 int main(int argc, char* argv[]) {
     int c = parseOptions(argc,argv);
+    if( printVersion )
+    {
+        fprintf(stderr, "zapif 1.1.0\n");
+    }
     extern FILE* yyin;
     if( c<argc ) {
         yyin = openFile(argv[c]);
