@@ -103,6 +103,7 @@ int main(int argc, char* argv[]) {
     if( printVersion )
     {
         fprintf(stderr, "zapif 1.1.0\n");
+        return 0;
     }
     extern FILE* yyin;
     if( c<argc ) {
