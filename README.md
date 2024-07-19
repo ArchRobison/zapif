@@ -56,7 +56,7 @@ The recognized options are:
 * `-Ufoo` - treat `foo` as undefined.  The preprocessor expression `defined(foo)` will evaluate to 0, and `foo` will be treated as 0 in other preprocessor expressions.
 * `-k` - interpret numerals in preprocessor expressions.  Without this option, numerals such as `0` are treated as unknown values.
 * `-n` - normalize `#if defined(x)` to `#ifdef x` if the whole expression was the result of simplification.  Do likewise for `#if !defined(x)` and the equivalent parentheses-free forms.
-* `-v` - print version information.
+* `-v` - print version information and exit.
 
 ## Limitations
 
