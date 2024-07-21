@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
     int c = parseOptions(argc,argv);
     if( printVersion )
     {
-        fprintf(stderr, "zapif 1.2.0\n");
+        fprintf(stderr, "zapif 1.2.1\n");
         return 0;
     }
     extern FILE* yyin;

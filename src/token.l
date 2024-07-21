@@ -125,6 +125,7 @@ DCHAR [!"#$%&'*+,-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~]*
     \/{SPACE}       {RET(DIV);}
     \%{SPACE}       {RET(REM);}
     !{SPACE}        {RET(LNOT);}
+    not{SPACE}      {RET(cMode ? ID : LNOT);}
     ~{SPACE}        {RET(NOT);}
     \({SPACE}       {RET(LPAREN);}
     \)              {RET(RPAREN);}

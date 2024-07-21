@@ -2,6 +2,7 @@
 ZAPIF=../build/zapif
 TEST_SRC=../test
 TMP=../build/tmp.out
+VERSION=../version.txt
 
 # Test that zapif with no arguments is an identity transform for C++.
 for i in $TEST_SRC/*.cpp
@@ -48,3 +49,7 @@ do
     $ZAPIF -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing -n $input > $TMP
     diff -U 5 "$i" "$TMP"
 done
+
+# Check that -v option works and is consistent with content of version.txt.
+$ZAPIF -v >&$TMP
+echo zapif `cat "$VERSION"` | diff -U 5 - "$TMP"
