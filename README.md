@@ -56,7 +56,7 @@ The recognized options are:
 * `-Dfoo=42` - treat `foo` as having the value `42`.
 * `-Dfoo` - same as `-Dfoo=1`
 * `-Ufoo` - treat `foo` as undefined. The preprocessor expression `defined(foo)` will evaluate to 0, and `foo` will be treated as 0 in other preprocessor expressions.
-* `-c` - assume input is C, not C++. Causes `and`, `or`, and `xor` to be treated as identifiers instead of operators in `#if` expressions.
+* `-c` - assume input is C, not C++. Causes `and`, `false`, `not`, `or`, `true` and `xor` to be treated as identifiers instead of their C++ meanings in `#if` expressions.
 * `-k` - interpret numerals in preprocessor expressions. Without this option, numerals such as `0` are treated as unknown values.
 * `-n` - normalize `#if defined(x)` to `#ifdef x` if the whole expression was the result of simplification. Do likewise for `#if !defined(x)` and the equivalent parentheses-free forms.
 * `-v` - print version information and exit.
