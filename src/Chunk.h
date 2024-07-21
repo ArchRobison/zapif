@@ -124,3 +124,4 @@ void print(Value x, T... rest) {
 
 extern bool interpretConstants;
 extern bool normalizeCond;
+extern int cMode;

@@ -36,8 +36,6 @@ static char* skipId(char* s) {
     return s;
 }
 
-int cMode = 0;
-
 static bool printVersion = false;
 
 static int parseOptions(int argc, char* argv[]) {

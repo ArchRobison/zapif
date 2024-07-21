@@ -58,10 +58,27 @@ Value wasSimplified(Value x) {
     return nullptr;
 }
 
+int cMode;
+
+//! Try to parse as a token having an integer value.
+//! If successful, set x to the the value and return true.
+//! Otherwise leave x in an unspecified state and return false.
 static bool tryParseInt( const std::string& s, Chunk::integer_type& x ) {
     char *endptr;
     x = std::strtoll(s.c_str(), &endptr, 0);
-    return *endptr==0;
+    if( *endptr==0 )
+        return true;
+    if( !cMode ) {
+        if( s == "true" ) {
+            x = 1;
+            return true;
+        }
+        if( s == "false" ) {
+            x = 0;
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Chunk::asInt(integer_type& x, bool relaxed) const {
