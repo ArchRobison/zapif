@@ -4,6 +4,8 @@
 void growTok();
 void emitCode();
 void mark_if();
+void stash_raw_string_dchar_seq();
+int is_raw_string_terminator();
 #if 0
 #define RET(x) fprintf(stderr,"[%s]",#x); return x;
 #else
@@ -31,6 +33,7 @@ PAREN_DEBRIS [ \t]*\([^)]*\)
 HASH ^[ \t]*#[ \t]*
 LEFT_SQUOTE ([LUu]|u8)?\'
 IF_DELIM [^a-zA-Z0-9_]
+DCHAR [!"#$%&'*+,-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~]*
 %%
 
 <INITIAL>{
@@ -46,7 +49,7 @@ IF_DELIM [^a-zA-Z0-9_]
 
     "\""    {transition(INITIAL,dquote);}
 
-    "R\"("  {transition(INITIAL,raw_string);}
+    R\"{DCHAR}\(    {stash_raw_string_dchar_seq(); transition(INITIAL,raw_string);}
 
     "//"    {transition(INITIAL,cplus_comment);}
 
@@ -77,7 +80,8 @@ IF_DELIM [^a-zA-Z0-9_]
 }
 
 <raw_string>{
-    ")\""       {BEGIN(old_state); munch();}
+    \){DCHAR}\" {if (is_raw_string_terminator()) {BEGIN(old_state);}
+                 munch();}
     (.|\n)      {munch();}
 }
 

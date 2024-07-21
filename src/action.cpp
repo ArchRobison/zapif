@@ -6,6 +6,8 @@
 #include <cstdio>
 
 extern char* yytext;
+extern int yyleng;
+extern int yylineno;
 
 void markPrimary( Value x ) {
     x->setIsPrimary();
@@ -140,6 +142,26 @@ void mark_if() {
     if_pos = buffer.size();
     assert(if_pos>=2 && buffer.substr(if_pos-2)=="if" ||
            if_pos>=4 && buffer.substr(if_pos-4)=="elif");
+}
+
+static std::string dchar_seq;
+
+void stash_raw_string_dchar_seq() {
+    assert(yyleng >= 3);
+    assert(yytext[0] == 'R');
+    assert(yytext[1] == '"');
+    assert(yytext[yyleng - 1] == '(');
+    // A long d-char-seq could be symptom of a problem, so warn user.
+    if( yyleng - 3 > 16 )
+        fprintf(stderr, "%d d-char-seq exceeds 16 bytes\n", yylineno);
+    dchar_seq.assign(yytext + 2, yyleng - 3);
+}
+
+int is_raw_string_terminator() {
+    assert(yyleng >= 2);
+    assert(yytext[0] == ')');
+    assert(yytext[yyleng - 1] == '"');
+    return dchar_seq.compare(0, std::string::npos, yytext + 1, yyleng - 2) == 0;
 }
 
 static std::vector<bit_triple_type> enable {3};

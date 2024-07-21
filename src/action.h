@@ -14,6 +14,15 @@ extern "C" {
     void emitCode();
     /** \brief Record where if or elif token is in token buffer. */
     void mark_if();
+    /** \brief Record the d-char-seq for a raw string.
+
+        Expects yytext to begin with `R"` and last character to be '('. */
+    void stash_raw_string_dchar_seq();
+    /** \brief True if yytext matches terminator of raw string.
+
+        Expects yytext to have form `).*"`.
+        Returns 1 if the `.*` matches the d-char-seq remembered by stash_raw_string_dchar_seq, otherwise 0. */
+    int is_raw_string_terminator();
     /**@}*/
 }
 
