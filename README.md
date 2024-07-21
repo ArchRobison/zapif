@@ -20,14 +20,16 @@ and the original form of numerals when simplifying. Literal numerals such as
 Examples of the simplifications that `zapif` knows:
 * 0 || y -> y
 * x || y -> 1 if x or y is nonzero.
-* 0 && y -> 0 
-* 0 | y -> y 
+* 0 && y -> 0
+* 0 | y -> y
+* 0 ^ y -> y
+* 0 & y -> 0
 
-Algebraic simplifications are limited to ones that seem to be useful for real header files. If you think I've missed a useful one, please open an issue, ideally with a citation to the header.
+Algebraic simplifications are limited to ones that seem to be useful for real C++ and C source. If you think I've missed a useful one, please open an issue, ideally with a citation to the source code.
 
-# Prequisites 
+# Prequisites
 
-I developed `zapif` on Mac OS X, but it should build on Linux without 
+I developed `zapif` on Mac OS X, but it should build on Linux without
 difficulty. To build `zapif` you will need:
 
 * flex 2.5 or 2.6
