@@ -6,10 +6,11 @@ void emitCode();
 void mark_if();
 void stash_raw_string_dchar_seq();
 int is_raw_string_terminator();
+extern int cMode;
 #if 0
-#define RET(x) fprintf(stderr,"[%s]",#x); return x;
+#define RET(x) fprintf(stderr,"[%s]",#x); return (x);
 #else
-#define RET(x) return x;
+#define RET(x) return (x);
 #endif
 #define YY_DECL int uniflex()
 
@@ -103,9 +104,12 @@ DCHAR [!"#$%&'*+,-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~]*
     "?"{SPACE}      {RET('?');}
     ":"{SPACE}      {RET(':');}
     "||"{SPACE}     {RET(LOR);}
+    or{SPACE}       {RET(cMode ? ID : LOR);}
     &&{SPACE}       {RET(LAND);}
+    and{SPACE}      {RET(cMode ? ID : LAND);}
     \|{SPACE}       {RET(IOR);}
     \^{SPACE}       {RET(XOR);}
+    xor{SPACE}      {RET(cMode ? ID : XOR);}
     \&{SPACE}       {RET(AND);}
     !={SPACE}       {RET(NOT_EQUAL);}
     =={SPACE}       {RET(EQUAL);}

@@ -1,7 +1,7 @@
 # zapif
 `zapif` algebraic simplifies C proprocessor conditionals and removes code that would never be selected by the preprocessor.
 
-Unlike [`unifdef`](http://dotat.at/prog/unifdef/), `zapif` simplifies conditionals that it cannot eliminate.  For example, given a file `demo.c` with:
+Unlike [`unifdef`](http://dotat.at/prog/unifdef/), `zapif` simplifies conditionals that it cannot eliminate. For example, given a file `demo.c` with:
 ```
 #if foo && bar || quod
 void f() {}
@@ -14,7 +14,7 @@ void f() {}
 #endif
 ```
 When simplifying a preprocessor directive, `zapif` tries to preserve whitespace
-and the original form of numerals when simplifying.  Literal numerals such as
+and the original form of numerals when simplifying. Literal numerals such as
 `0` and `1` are treated as unknown values unless the `-k` option is present.
 
 Examples of the simplifications that `zapif` knows:
@@ -23,23 +23,23 @@ Examples of the simplifications that `zapif` knows:
 * 0 && y -> 0 
 * 0 | y -> y 
 
-Algebraic simplifications are limited to ones that seem to be useful for real header files.  If you think I've missed a useful one, please open an issue, ideally with a citation to the header.
+Algebraic simplifications are limited to ones that seem to be useful for real header files. If you think I've missed a useful one, please open an issue, ideally with a citation to the header.
 
 # Prequisites 
 
 I developed `zapif` on Mac OS X, but it should build on Linux without 
-difficulty.  To build `zapif` you will need:
+difficulty. To build `zapif` you will need:
 
 * flex 2.5 or 2.6
 * bison 2.3 or 3.0
-* a C++11 compiler.  The default is `g++`.
+* a C++11 compiler. The default is `g++`.
 
 # Building `zapif`
 
 1. `cd build`
 2. `make`
 
-The 2nd step builds the executable and tests it.  If the test fails, you will see output from `diff`.
+The 2nd step builds the executable and tests it. If the test fails, you will see output from `diff`.
 
 # Using `zapif`
 
@@ -53,9 +53,10 @@ The recognized options are:
 
 * `-Dfoo=42` - treat `foo` as having the value `42`.
 * `-Dfoo` - same as `-Dfoo=1`
-* `-Ufoo` - treat `foo` as undefined.  The preprocessor expression `defined(foo)` will evaluate to 0, and `foo` will be treated as 0 in other preprocessor expressions.
-* `-k` - interpret numerals in preprocessor expressions.  Without this option, numerals such as `0` are treated as unknown values.
-* `-n` - normalize `#if defined(x)` to `#ifdef x` if the whole expression was the result of simplification.  Do likewise for `#if !defined(x)` and the equivalent parentheses-free forms.
+* `-Ufoo` - treat `foo` as undefined. The preprocessor expression `defined(foo)` will evaluate to 0, and `foo` will be treated as 0 in other preprocessor expressions.
+* `-c` - assume input is C, not C++. Causes `and`, `or`, and `xor` to be treated as identifiers instead of operators in `#if` expressions.
+* `-k` - interpret numerals in preprocessor expressions. Without this option, numerals such as `0` are treated as unknown values.
+* `-n` - normalize `#if defined(x)` to `#ifdef x` if the whole expression was the result of simplification. Do likewise for `#if !defined(x)` and the equivalent parentheses-free forms.
 * `-v` - print version information and exit.
 
 ## Limitations

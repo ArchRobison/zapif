@@ -36,6 +36,8 @@ static char* skipId(char* s) {
     return s;
 }
 
+int cMode = 0;
+
 static bool printVersion = false;
 
 static int parseOptions(int argc, char* argv[]) {
@@ -74,6 +76,9 @@ static int parseOptions(int argc, char* argv[]) {
                 createDef(symbol,def);
                 break;
             }
+            case 'c':
+                cMode = true;
+                break;
             case 'k':
                 interpretConstants = true;
                 break;
@@ -102,7 +107,7 @@ int main(int argc, char* argv[]) {
     int c = parseOptions(argc,argv);
     if( printVersion )
     {
-        fprintf(stderr, "zapif 1.1.1\n");
+        fprintf(stderr, "zapif 1.2.0\n");
         return 0;
     }
     extern FILE* yyin;

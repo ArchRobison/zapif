@@ -1,7 +1,7 @@
 OBJ = gram.tab.o lex.yy.o Chunk.o action.o main.o
 
 VPATH = ../src
-CPLUS_FLAGS = -g
+CPLUS_FLAGS = -O
 CPLUS = g++ -std=c++11
 ZAPIF = zapif
 

@@ -3,18 +3,33 @@ ZAPIF=../build/zapif
 TEST_SRC=../test
 TMP=../build/tmp.out
 
-# Test that zapif with no arguments is an identity transform.
-for i in $TEST_SRC/*.c $TEST_SRC/*.cpp
+# Test that zapif with no arguments is an identity transform for C++.
+for i in $TEST_SRC/*.cpp
 do
     $ZAPIF $i > "$TMP"
     diff -U 5 "$TMP" $i
 done
 
-# Check tests that involve replacements
-for i in $TEST_SRC/*.x $TEST_SRC/*.xpp
+# Test that zapif with only -c argument is an identity transform for C.
+for i in $TEST_SRC/*.c
+do
+    $ZAPIF -c $i > "$TMP"
+    diff -U 5 "$TMP" $i
+done
+
+# Check C++ tests that involve replacements
+for i in $TEST_SRC/*.xpp
 do
     input=${i/.x/.c}
     $ZAPIF -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing $input > $TMP
+    diff -U 5 "$i" "$TMP"
+done
+
+# Check C tests that involve replacements
+for i in $TEST_SRC/*.x
+do
+    input=${i/.x/.c}
+    $ZAPIF -c -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing $input > $TMP
     diff -U 5 "$i" "$TMP"
 done
 

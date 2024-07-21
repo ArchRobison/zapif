@@ -81,15 +81,21 @@ static bool asInts(Value x, Value y, Chunk::integer_type& i, Chunk::integer_type
 Value binaryOp( Value x, Value op, Value y, int operation ) {
     // Do algebraic simplifications.  Though there are many possible,
     // the code here handles only ones which seem to have practical
-    // use in real header files.
+    // use in real code.
     switch(operation) {
+        case AND:
+            if( *x==0 ) return x;
+            if( *y==0 ) return y;
+            break;
         case IOR:
+        case XOR:
             if( *x==0 ) return y;
             if( *y==0 ) return x;
             break;
     }
     Chunk::integer_type i, j;
     if( asInts(x,y,i,j) ) {
+        // Do constant folding
         Chunk::integer_type k;
         switch(operation) {
             default: assert(false);
