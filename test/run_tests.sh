@@ -58,6 +58,14 @@ do
     diff -U 5 "$i" "$TMP"
 done
 
+# Check tests that involve extended character set
+for i in $TEST_SRC/*.e
+do
+    input=${i/.e/.f}
+    $ZAPIF -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing -e '-D$three=3' '-D@four=4' -n $input > $TMP
+    diff -U 5 "$i" "$TMP"
+done
+
 # Check that -v option works and is consistent with content of version.txt.
 $ZAPIF -v >&$TMP
 echo zapif `cat "$VERSION"` | diff -U 5 - "$TMP"

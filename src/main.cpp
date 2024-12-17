@@ -8,7 +8,7 @@
 extern int yyparse();
 extern char* yytext;
 extern int yylineno;
-
+extern int extendedCharMode;
 static bool iseof;
 
 extern "C" int yylex() {
@@ -27,10 +27,14 @@ void yyerror(const char* msg) {
     std::fprintf(stderr,"%s %d: %s at '%s'\n",fileName ? fileName : "<stdin>", yylineno, msg, yytext);
 }
 
+static bool isExtendedChar(char c) {
+    return extendedCharMode && (c == '$' || c == '@');
+}
+
 static char* skipId(char* s) {
-    if(isalpha(*s)||*s=='_') {
+    if(isalpha(*s)||*s=='_'||isExtendedChar(*s)) {
         ++s;
-        while(isalnum(*s)||*s=='_')
+        while(isalnum(*s)||*s=='_'||isExtendedChar(*s))
             ++s;
     }
     return s;
@@ -77,6 +81,9 @@ static int parseOptions(int argc, char* argv[]) {
             case 'c':
                 cMode = true;
                 break;
+            case 'e':
+                extendedCharMode = true;
+                break;
             case 'k':
                 interpretConstants = true;
                 break;
@@ -105,7 +112,7 @@ int main(int argc, char* argv[]) {
     int c = parseOptions(argc,argv);
     if( printVersion )
     {
-        fprintf(stderr, "zapif 1.2.1\n");
+        fprintf(stderr, "zapif 1.3.0\n");
         return 0;
     }
     extern FILE* yyin;
