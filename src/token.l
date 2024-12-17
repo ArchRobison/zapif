@@ -7,6 +7,7 @@ void mark_if();
 void stash_raw_string_dchar_seq();
 int is_raw_string_terminator();
 extern int cMode;
+int extendedCharMode;
 #if 0
 #define RET(x) fprintf(stderr,"[%s]",#x); return (x);
 #else
@@ -130,6 +131,13 @@ DCHAR [!"#$%&'*+,-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~]*
     \({SPACE}       {RET(LPAREN);}
     \)              {RET(RPAREN);}
     [A-Za-z_0-9]+   {RET(ID);}   /* Really id or numeral */
+    [A-Za-z_0-9\$\@]+ {
+                        if (!extendedCharMode)
+                        {
+                            fprintf(stderr, "%d identifer with $ or @: %s\n", yylineno, yytext);
+                        }
+                        RET(ID);
+                    }
     {LEFT_SQUOTE}   {transition(preproc,squote);}
     "\""            {transition(preproc,dquote);}
     ("//".*)?(\n|\r)? {BEGIN(INITIAL); RET(TRAIL);}
@@ -139,7 +147,7 @@ DCHAR [!"#$%&'*+,-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~]*
 
     .           {
                     if(strlen(yytext)<=1)
-                        fprintf(stderr,"%d unrecognized char: 0x%X", yylineno, yytext[0]);
+                        fprintf(stderr,"%d unrecognized char: 0x%X\n", yylineno, yytext[0]);
                     else
                         fprintf(stderr,"%d unrecognized string: %s\n", yylineno, yytext);
                 }
