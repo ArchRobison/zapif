@@ -2,12 +2,15 @@
 #include <cassert>
 #include <map>
 #include <cstdlib>
+#include <cctype>
 
 static std::map<int,Chunk> IntMap;
 static std::map<std::string,Chunk> TextMap;
 static std::map<std::string,Chunk> RhsMap;
 static std::map<std::string,Value> LookupMap;
 static std::map<std::pair<Value,Value>,Chunk> CatMap;
+
+extern int yylineno;
 
 //! Try to interpret text input as integer values when applicable.
 bool interpretConstants;
@@ -60,15 +63,56 @@ Value wasSimplified(Value x) {
 
 int cMode;
 
-//! Try to parse as a token having an integer value.
+//! Try to parse string s as a token having an integer value.
 //! If successful, set x to the the value and return true.
 //! Otherwise leave x in an unspecified state and return false.
+//!
+//! String s is assumed to be an ID vetted by token.l, so the code
+//! here does not have to completely check the form of s.
 static bool tryParseInt( const std::string& s, Chunk::integer_type& x ) {
-    char *endptr;
-    x = std::strtoll(s.c_str(), &endptr, 0);
-    if( *endptr==0 )
-        return true;
-    if( !cMode ) {
+    if( std::isdigit(s[0]) ) {
+        int base = 10;
+        auto p = s.begin();
+        // Check for prefix indicating the base. This is necessary because
+        // std::strtoll and stdd::strtoull do not handle the 0b and 0B prefixes.
+        if( s[0] == '0' && s.size() >= 2 ) {
+            switch( s[1] ) {
+                case 'b':
+                case 'B': base = 2; p += 2; break;
+                case 'x':
+                case 'X': base = 16; p += 2; break;
+                default: base = 8; p += 1; break;
+            }
+        }
+        // Copy numeral to tmp in form that std::strtoll and std::strtoul understand.
+        std::string tmp;
+        tmp.reserve(p - s.begin());
+        bool isUnsigned = false;
+        for(; p != s.end(); ++p ) {
+            switch( *p ) {
+                case 'l':
+                case 'L': goto convert;
+                case 'u':
+                case 'U':
+                    isUnsigned = true;
+                    goto convert;
+                case '\'': continue;
+                default: tmp.push_back(*p);
+            }
+        }
+convert:
+        char *endptr;
+        if( isUnsigned ) {
+            auto y = std::strtoull(tmp.c_str(), &endptr, base);
+            if( y > std::numeric_limits<Chunk::integer_type>::max() )
+                fprintf(stderr, "%d unsigned literal %s does not fit in long long", yylineno, s.c_str());
+            x = y;
+        }
+        else
+            x = std::strtoll(tmp.c_str(), &endptr, base);
+        if( *endptr==0 )
+            return true;
+    } else if( !cMode ) {
         if( s == "true" ) {
             x = 1;
             return true;

@@ -36,6 +36,7 @@ HASH ^[ \t]*#[ \t]*
 LEFT_SQUOTE ([LUu]|u8)?\'
 IF_DELIM [^a-zA-Z0-9_]
 DCHAR [!"#$%&'*+,-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~]*
+INT_SUFFIX [uU]?[lL]?[lL]?
 %%
 
 <INITIAL>{
@@ -130,8 +131,12 @@ DCHAR [!"#$%&'*+,-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~]*
     ~{SPACE}        {RET(NOT);}
     \({SPACE}       {RET(LPAREN);}
     \)              {RET(RPAREN);}
-    [A-Za-z_0-9]+   {RET(ID);}   /* Really id or numeral */
-    [A-Za-z_0-9\$\@]+ {
+    [1-9](\'?[0-9])*{INT_SUFFIX}                    {RET(ID);} /* Decimal literal */
+    0[bB][01](\'?[01])*{INT_SUFFIX}                 {RET(ID);} /* Binary literal */
+    0(\'?[0-7])*{INT_SUFFIX}                        {RET(ID);} /* Octal literal */
+    0[xX][0-9A-Fa-f](\'?[0-9A-Fa-f])*{INT_SUFFIX}   {RET(ID);} /* Hex literal */
+    [A-Za-z_][A-Za-z_0-9]*  {RET(ID);}   /* Identifier or boolean literal */
+    [A-Za-z\$\@][A-Za-z_0-9\$\@]* {
                         if (!extendedCharMode)
                         {
                             fprintf(stderr, "%d identifer with $ or @: %s\n", yylineno, yytext);

@@ -1,5 +1,5 @@
 # zapif
-`zapif` algebraic simplifies C proprocessor conditionals and removes code that would never be selected by the preprocessor.
+`zapif` algebraic simplifies C and C++ preprocessor conditionals, and removes code that would never be selected by the preprocessor.
 
 Unlike [`unifdef`](http://dotat.at/prog/unifdef/), `zapif` simplifies conditionals that it cannot eliminate. For example, given a file `demo.c` with:
 ```
@@ -64,6 +64,8 @@ The recognized options are:
 
 ## Limitations
 
-* Numerals are recognized as having values only if they fit in a C++
-  `long long`, follow the C conventions for decimal, octal, or hexadecimal,
-  and do not have any suffixes.
+* Numerals are recognized as having values only if they fit in a C++ `long long`,
+  and follow C++14 conventions for decimal, octal, binary, or hexadecimal literals.
+
+* Constant folding uses `long long`, even if a literal has a suffix specifying "unsigned".
+  A warning is issued if a literal has an unsigned suffix and exceeds the range of `long long`.
