@@ -1,8 +1,9 @@
 #include "Chunk.h"
 #include <cassert>
-#include <map>
-#include <cstdlib>
 #include <cctype>
+#include <cstdlib>
+#include <limits>
+#include <map>
 
 static std::map<int,Chunk> IntMap;
 static std::map<std::string,Chunk> TextMap;
