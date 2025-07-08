@@ -180,7 +180,7 @@ static bool push_level(Value x) {
 
 static void printSpaceIfGlueHazard(Value x, Value y) {
     if( isalnum(rightmostChar(x)) && isalnum(leftmostChar(y)))
-        printf(" ");
+        fputc(' ', outputFile);
 }
 
 static void printIf(Value if_or_elif, size_t len, Value x, Value y, Value trail) {
@@ -266,6 +266,6 @@ void endif( Value endif_tok, Value trail ) {
 void emitCode() {
     growTok();
     if( enable.back()&1 )
-        printf("%s",buffer.c_str());
+        fputs(buffer.c_str(), outputFile);
     buffer.clear();
 }

@@ -27,7 +27,7 @@ Examples of the simplifications that `zapif` knows:
 
 Algebraic simplifications are limited to ones that seem to be useful for real C++ and C source. If you think I've missed a useful one, please open an issue, ideally with a citation to the source code.
 
-# Prequisites
+# Prerequisites
 
 I developed `zapif` on Mac OS X, but it should build on Linux without
 difficulty. To build `zapif` you will need:
@@ -49,7 +49,7 @@ The basic syntax is:
 * `zapif` _options_ [_inputfile_]
 
 If no input file is specified, input is `stdin`.
-Output always goes to `stdout`.
+Output goes to `stdout` unless the `-o` option is used.
 
 The recognized options are:
 
@@ -60,7 +60,9 @@ The recognized options are:
 * `-e` - allow `$` and `@` in identifiers.
 * `-k` - interpret numerals in preprocessor expressions. Without this option, numerals such as `0` are treated as unknown values.
 * `-n` - normalize `#if defined(x)` to `#ifdef x` if the whole expression was the result of simplification. Do likewise for `#if !defined(x)` and the equivalent parentheses-free forms.
+* `-o file` - use file for output instead of stdout.
 * `-v` - print version information and exit.
+* `--help` - print description of comand line usage.
 
 ## Limitations
 

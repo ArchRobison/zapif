@@ -13,6 +13,8 @@ static std::map<std::pair<Value,Value>,Chunk> CatMap;
 
 extern int yylineno;
 
+FILE* outputFile;
+
 //! Try to interpret text input as integer values when applicable.
 bool interpretConstants;
 
@@ -221,18 +223,18 @@ static bool annotate = false;
 
 static void note(const char* s) {
     if( annotate ) {
-        printf("%s",s);
+        fputs(s, outputFile);
     }
 }
 
 void print(Value x) {
     if( x->my_kind&Chunk::text ) {
         note("{text ");
-        printf("%s",x->my_str.c_str());
+        fputs(x->my_str.c_str(), outputFile);
         note("}");
     } else if( x->isInt() ) {
         note("{value ");
-        printf("%lld",x->my_value);
+        fprintf(outputFile, "%lld", x->my_value);
         note("}");
     } else {
         note("{");
@@ -255,6 +257,6 @@ void printWithReplacement(Value x, size_t pos, size_t len, const char* replaceme
     assert( pos<=s.size() );
     assert( len<=pos );
     note("{repl ");
-    printf("%s%s%s", s.substr(0,pos-len).c_str(), replacement, s.c_str()+pos);
+    fprintf(outputFile, "%s%s%s", s.substr(0,pos-len).c_str(), replacement, s.c_str()+pos);
     note("}");
 }

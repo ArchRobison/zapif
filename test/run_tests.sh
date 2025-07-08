@@ -18,11 +18,11 @@ do
     diff -U 5 "$TMP" $i
 done
 
-# Check C++ tests that involve replacements
+# Check C++ tests that involve replacements and try -o option.
 for i in $TEST_SRC/*.xpp
 do
     input=${i/.x/.c}
-    $ZAPIF -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing $input > $TMP
+    $ZAPIF -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing -o $TMP $input
     diff -U 5 "$i" "$TMP"
 done
 
@@ -34,7 +34,7 @@ do
     diff -U 5 "$i" "$TMP"
 done
 
-# Check C++ tests that involve replacments and interpreting literals (-k) 
+# Check C++ tests that involve replacments and interpreting literals (-k)
 for i in $TEST_SRC/*.kpp
 do
     input=${i/.k/.c}
@@ -42,15 +42,16 @@ do
     diff -U 5 "$i" "$TMP"
 done
 
-# Check C tests that involve replacments and interpreting literals (-c -k) 
+# Check C tests that involve replacments and interpreting literals (-c -k)
+# and try -o option.
 for i in $TEST_SRC/*.k
 do
     input=${i/.k/.c}
-    $ZAPIF -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing -c -k $input > $TMP
+    $ZAPIF -Dzero=0 -Done=1 -Dtwo=2 -Dfive=5 -Unil -Unothing -o $TMP -c -k $input
     diff -U 5 "$i" "$TMP"
 done
 
-# Check tests that involve replacments and normalization (-n) 
+# Check tests that involve replacments and normalization (-n)
 for i in $TEST_SRC/*.n
 do
     input=${i/.n/.c}
