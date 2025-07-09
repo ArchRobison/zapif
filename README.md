@@ -29,19 +29,39 @@ Algebraic simplifications are limited to ones that seem to be useful for real C+
 
 # Prerequisites
 
-I developed `zapif` on Mac OS X, but it should build on Linux without
-difficulty. To build `zapif` you will need:
+Zapif uses CMake to build, and supports both Linux and Windows. The basic dependencies are:
 
 * flex 2.5 or 2.6
 * bison 2.3 or 3.0
 * a C++11 compiler. The default is `g++`.
+* CMake 4.0 or higher
+
+Building for windows still requires flex and bison. The suggested distribution is [winflexbison](https://github.com/lexxmark/winflexbison) 2.5.25 or higher.
 
 # Building `zapif`
 
-1. `cd build`
-2. `make`
+Run the following comments in the `zapif` directory (this one).
 
-The 2nd step builds the executable and tests it. If the test fails, you will see output from `diff`.
+```sh
+cmake . -B build
+cmake --build build
+```
+
+# Testing `zapif`
+
+Zapif can be tested through `ctest`. To run the tests, execute the following command in the build directory:
+
+```sh
+ctest --output-on-failure
+```
+
+ If the test fails, you will see output from `diff`. If the `diff` output is not helpful, you can run:
+
+```sh
+ctest --rerun-failed --verbose
+```
+
+which will give you additional info, such as the stderr from `zapif`. You can also review the `.out` files in the `test` subdir (in the build dir).
 
 # Using `zapif`
 

@@ -11,7 +11,7 @@ static std::map<std::string,Chunk> RhsMap;
 static std::map<std::string,Value> LookupMap;
 static std::map<std::pair<Value,Value>,Chunk> CatMap;
 
-extern int yylineno;
+extern "C" int yylineno;
 
 FILE* outputFile;
 
