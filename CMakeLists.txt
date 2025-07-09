@@ -23,3 +23,7 @@ if(NOT MSVC)
 endif()
 
 install(TARGETS zapif)
+
+include(CTest)
+enable_testing()
+add_subdirectory(test)
