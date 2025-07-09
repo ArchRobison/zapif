@@ -1,6 +1,6 @@
 #include "action.h"
 #include "Chunk.h"
-#include "build/gram.tab.hpp"
+#include "gram.tab.hpp"
 #include <vector>
 #include <cctype>
 #include <cstdio>
