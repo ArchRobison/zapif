@@ -159,11 +159,22 @@ foreach(test_file IN LISTS ZAPIF_TEST_SOURCE_FILES)
     add_test(
         NAME ${test_name}
         COMMAND
-        $<TARGET_FILE:zapif> ${ZAPIF_ARGS} -o ${output_file} ${input_file}
-        && diff -U 5 ${expected_file} ${output_file}
+            $<TARGET_FILE:zapif> ${ZAPIF_ARGS} -o ${output_file} ${input_file}
+            && diff -U 5 ${expected_file} ${output_file}
     )
     set_property(
         TEST ${test_name}
         PROPERTY PASS_REGULAR_EXPRESSION "^$" # Any output from `diff` means the test failed.
     )
 endforeach()
+
+# Add a final test to validate that the zapif version matches the version from version.txt.
+add_test(
+    NAME test_zapif_version
+    COMMAND
+        $<TARGET_FILE:zapif> -v
+)
+set_property(
+        TEST test_zapif_version
+        PROPERTY PASS_REGULAR_EXPRESSION "zapif ${ZAPIF_VERSION}"
+)
