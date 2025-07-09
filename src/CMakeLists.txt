@@ -1,14 +1,32 @@
+set(BISON_ARGS
+    -r all
+)
+
+if(${ZAPIF_DEBUG_BISON})
+    list(APPEND BISON_ARGS -t)
+endif()
+
 bison_target(zapif_parser
     gram.ypp
     ${CMAKE_CURRENT_BINARY_DIR}/gram.cpp
     DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/gram.tab.hpp
-    OPTIONS -r all $<$<CONFIG:Debug>:-t>
+    OPTIONS ${BISON_ARGS}
 )
+
+set(FLEX_ARGS "")
+
+if(MSVC)
+    list(APPEND FLEX_ARGS --wincompat)
+endif()
+
+if(${ZAPIF_DEBUG_FLEX})
+    list(APPEND FLEX_ARGS --debug)
+endif()
 
 flex_target(zapif_lexer
     token.l
     ${CMAKE_CURRENT_BINARY_DIR}/lex.yy.c
-    OPTIONS $<$<CONFIG:Debug>:--debug>
+    OPTIONS ${FLEX_ARGS}
 )
 
 add_flex_bison_dependency(zapif_lexer zapif_parser)

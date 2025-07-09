@@ -6,9 +6,10 @@
 #include "Chunk.h"
 
 extern int yyparse();
-extern char* yytext;
-extern int yylineno;
-extern int extendedCharMode;
+extern "C" char* yytext;
+extern "C" int yylineno;
+extern "C" int extendedCharMode;
+extern "C" FILE* yyin;
 static bool iseof;
 
 extern "C" int yylex() {
@@ -161,7 +162,6 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "zapif 1.5.0\n");
         return 0;
     }
-    extern FILE* yyin;
     yyin = c<argc ? openFile(argv[c], false) : stdin;
 
     extern FILE* outputFile;

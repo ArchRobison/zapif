@@ -5,9 +5,9 @@
 #include <cctype>
 #include <cstdio>
 
-extern char* yytext;
-extern int yyleng;
-extern int yylineno;
+extern "C" char* yytext;
+extern "C" int yyleng;
+extern "C" int yylineno;
 
 void markPrimary( Value x ) {
     x->setIsPrimary();

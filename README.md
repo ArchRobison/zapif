@@ -29,13 +29,14 @@ Algebraic simplifications are limited to ones that seem to be useful for real C+
 
 # Prerequisites
 
-I developed `zapif` on Mac OS X, but it should build on Linux without
-difficulty. To build `zapif` you will need:
+Zapif uses CMake to build, and supports both Linux and Windows. The basic dependencies are:
 
 * flex 2.5 or 2.6
 * bison 2.3 or 3.0
 * a C++11 compiler. The default is `g++`.
 * CMake 4.0 or higher
+
+Building for windows still requires flex and bison. The suggested distribution is [winflexbison](https://github.com/lexxmark/winflexbison) 2.5.25 or higher.
 
 # Building `zapif`
 
