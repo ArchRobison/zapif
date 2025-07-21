@@ -81,7 +81,7 @@ The recognized options are:
 * `-k` - interpret numerals in preprocessor expressions. Without this option, numerals such as `0` are treated as unknown values.
 * `-n` - normalize `#if defined(x)` to `#ifdef x` if the whole expression was the result of simplification. Do likewise for `#if !defined(x)` and the equivalent parentheses-free forms.
 * `-o file` - use file for output instead of stdout.
-* `-v` - print version information and exit.
+* `-v` - print version information on stdout and exit.
 * `--help` - print description of comand line usage.
 
 ## Limitations
