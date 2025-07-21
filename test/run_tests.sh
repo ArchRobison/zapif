@@ -68,5 +68,5 @@ do
 done
 
 # Check that -v option works and is consistent with content of version.txt.
-$ZAPIF -v >&$TMP
+$ZAPIF -v >$TMP
 echo zapif `cat "$VERSION"` | diff -U 5 - "$TMP"

@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
     int c = parseOptions(argc,argv);
     if( printVersion )
     {
-        fprintf(stderr, "zapif 1.5.0\n");
+        printf("zapif 1.5.1\n");
         return 0;
     }
     yyin = c<argc ? openFile(argv[c], false) : stdin;
