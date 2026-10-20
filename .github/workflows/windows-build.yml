@@ -32,9 +32,9 @@ jobs:
     - name: Update CMake
       # We need to use CMake 4.0 or higher, so we need to download it and stick it on the path.
       run: |
-        Invoke-Webrequest https://github.com/Kitware/CMake/releases/download/v4.1.0-rc1/cmake-4.1.0-rc1-windows-x86_64.zip -OutFile cmake.zip
+        Invoke-Webrequest https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-windows-x86_64.zip -OutFile cmake.zip
         Expand-Archive .\cmake.zip -DestinationPath cmake
-        echo "$pwd\cmake\cmake-4.1.0-rc1-windows-x86_64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "$pwd\cmake\cmake-4.4.4-windows-x86_64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Install WinFlexBison
       # The build also depends on flex/bison, which is... definitely not installed by default.
