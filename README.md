@@ -72,6 +72,12 @@ it as a build tool in another project via `tool_requires` — run:
 conan create .
 ```
 
+The recipe sets `vendor = True`, so projects that consume the package only need its
+prebuilt binary, and not dependencies.
+
+As a result, Conan will not build `zapif` from source as a dependency of another
+project unless that project passes `-c tools.graph:vendor=build`.
+
 ## Building directly with CMake
 
 If you already have flex, bison, and CMake 4.0 or higher installed, run the following

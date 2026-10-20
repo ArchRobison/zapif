@@ -5,7 +5,7 @@ from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.files import copy, load
 
-required_conan_version = ">=2.0"
+required_conan_version = ">=2.4"
 
 class ZapifConan(ConanFile):
     name = "zapif"
@@ -21,6 +21,7 @@ class ZapifConan(ConanFile):
     topics = ("preprocessor", "conditional-compilation", "unifdef",
               "code-simplification", "c", "cpp", "cli")
     package_type = "application"
+    vendor = True
     settings = "os", "arch", "compiler", "build_type"
 
     exports_sources = "CMakeLists.txt", "version.txt", "LICENSE", "src/*", "test/*"
@@ -32,7 +33,7 @@ class ZapifConan(ConanFile):
         cmake_layout(self)
 
     def build_requirements(self):
-        if self.settings.os == "Windows":
+        if self.settings_build.os == "Windows":
             self.tool_requires("winflexbison/2.5.25")
         else:
             self.tool_requires("flex/2.6.4")

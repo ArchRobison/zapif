@@ -1,4 +1,5 @@
 from conan import ConanFile
+from conan.tools.build import can_run
 
 
 class TestPackageConan(ConanFile):
@@ -9,5 +10,7 @@ class TestPackageConan(ConanFile):
         self.requires(self.tested_reference_str)
 
     def test(self):
-        # zapif accepts -v (not --version); prints "zapif <version>" and exits 0.
-        self.run("zapif -v", env="conanrun")
+        # Cross-built binaries (e.g. armv8 built on an x86_64 machine) can't run here.
+        if can_run(self):
+            # zapif accepts -v (not --version); prints "zapif <version>" and exits 0.
+            self.run("zapif -v", env="conanrun")
