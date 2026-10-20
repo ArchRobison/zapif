@@ -1,0 +1,5 @@
+# Conan recipe revisions hash the file and depend on line endings, so they need to be consistent.
+* text=auto eol=lf
+
+# This test explicitly contains CR line endings.
+test/ifndev_cr.c -text
